@@ -7,91 +7,50 @@
 
 using namespace std;
 
-
-/* FALLA, pero está bueno para tener una idea */
-
-/* Devuelve el indice de la mejor carta ganadora, si existe.
-    Caso contrario, devuelve -1 */
-int puede_ganar(array<int,3> princesa, int carta_principe) {
-    int indice = -1;
-    int carta = 53;  // numero más grande
-    for (int i=0; i<3; i++) {
-        if (princesa[i] > carta_principe && princesa[i] < carta) {
-            indice = i;
-            carta = princesa[i];
-        }
+int carta_para_el_principe(array<int,3> princesa, array<int,2> principe, int carta_princesa) {
+    int carta = carta_princesa + 1;
+    while(find(ALL(princesa), carta) != princesa.end() || find(ALL(principe), carta) != principe.end()) {
+        carta++;
     }
-    return indice;
-}
-
-
-/* Devuelve el indice de la carta con la que la princesa pierde mejor.
-   Se llama siempre despues de puede_ganar */
-int perder_bien(array<int,3> princesa) {
-    int indice = -1;
-    int carta = 53;
-    for (int i=0; i<3; i++) {
-        if (princesa[i] != -1 && princesa[i] < carta) {
-            indice = i;
-            carta = princesa[i];
-        }
-    }
-    return indice;
-}
-
-
-// Devuelve el valor de la carta restante
-int carta_restante(array<int, 3> princesa) {
-    for (int i=0; i<3; i++) {
-        if (princesa[i] != -1) {
-            return princesa[i];
-        }
-    }
+    return carta;
 }
 
 int main() {
     array<int,3> princesa;
     array<int,2> principe;
-    vector<int> cartas_jugadas;
+    array<int,3> princesa_indices = {0,1,2};
+    array<int,2> principe_indices = {0,1};
     int puntaje_princesa, puntaje_principe;
-    int pg, pb, cr;  // puede_ganar, perder_bien, carta_restante
+    int carta_principe;
     while(scanf("%d %d %d %d %d", &princesa[0], &princesa[1], &princesa[2], &principe[0], &principe[1]),
-          princesa[0] != 0) {
-        puntaje_princesa = 0;
-        puntaje_principe = 0;
-        cartas_jugadas.clear();
-        sort(ALL(princesa));
-        sort(ALL(principe));
-        for (int ronda=0; ronda<2; ronda++) {
-            cartas_jugadas.push_back(principe[ronda]);
-            pg = puede_ganar(princesa, principe[ronda]);
-            if (pg == -1) {
-                puntaje_principe++;
-                pb = perder_bien(princesa);
-                cartas_jugadas.push_back(princesa[pb]);
-                princesa[pb] = -1;
-            } else {
-                puntaje_princesa++;
-                cartas_jugadas.push_back(princesa[pg]);
-                princesa[pg] = -1;
-            }
-        }
-        if (puntaje_princesa == 2) {
+            princesa[0] != 0) {
+        carta_principe = 0;  // calcular max con esto entre todas las posibles rondas.
+        do {
+            do {
+                puntaje_princesa = 0;
+                puntaje_principe = 0;
+                for (int ronda = 0; ronda < 2; ronda++) {
+                    if (princesa[princesa_indices[ronda]] > principe[principe_indices[ronda]]) {
+                        puntaje_princesa++;
+                    } else {
+                        puntaje_principe++;
+                    }
+                }
+                if (puntaje_princesa == 2) {
+                    carta_principe = 53;  // 53 para que el max de 53. El print sera -1.
+                } else if (puntaje_princesa == 1 && puntaje_principe == 1) {
+                    carta_principe = max(carta_principe, carta_para_el_principe(princesa, principe, 
+                        princesa[princesa_indices[2]]));
+                } else if (puntaje_principe == 2) {
+                    carta_principe = max(carta_principe, carta_para_el_principe(princesa, principe, 0));
+                }
+            } while (next_permutation(ALL(principe_indices)));
+        } while(next_permutation(ALL(princesa_indices)));
+
+        if (carta_principe == 53) {
             printf("-1\n");
-        }
-        else if (puntaje_principe == 2) {
-            printf("1\n");
         } else {
-            cr = carta_restante(princesa);
-            cr++;
-            while(find(cartas_jugadas.begin(), cartas_jugadas.end(), cr) != cartas_jugadas.end()) {
-                cr++;
-            }
-            if (cr == 53) {
-                printf("-1\n");
-            } else {
-                printf("%d\n", cr);
-            }
+            printf("%d\n", carta_principe);
         }
     }
     return 0;
