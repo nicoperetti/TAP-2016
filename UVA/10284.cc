@@ -178,32 +178,22 @@ void attacked_board(array<array<char, BOARD_N>, BOARD_N> &board) {
             if (!empty_square(square)) {
                 switch (square) {
                     case 'r':
-                        rook_attack(board, i, j);
-                        break;
                     case 'R':
                         rook_attack(board, i, j);
                         break;
                     case 'n':
-                        knight_attack(board, i, j);
-                        break;
                     case 'N':
                         knight_attack(board, i, j);
                         break;
                     case 'b':
-                        bishop_attack(board, i, j);
-                        break;
                     case 'B':
                         bishop_attack(board, i, j);
                         break;
                     case 'q':
-                        queen_attack(board, i, j);
-                        break;
                     case 'Q':
                         queen_attack(board, i, j);
                         break;
                     case 'k':
-                        king_attack(board, i, j);
-                        break;
                     case 'K':
                         king_attack(board, i, j);
                         break;
